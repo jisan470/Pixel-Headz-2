@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pixel Headz — Genesis is coming</title>
+<style>
+  :root{
+    --lime: #d4ff1e;
+    --lime-dim: #a8cc17;
+    --bg: #0a0a0a;
+    --card-bg: #131313;
+    --text-dim: #8a8a8a;
+    --amber:#e6b800;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{
+    background:var(--bg);
+    color:#fff;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    width:100%;
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+  button{font-family:inherit; cursor:pointer;}
+  .phone{
+    max-width:420px;
+    margin:0 auto;
+    position:relative;
+    min-height:100vh;
+    background:var(--bg);
+  }
+
+  /* ---------- SPLASH SCREEN ---------- */
+  #splash{
+    position:fixed; inset:0; background:var(--lime); z-index:80;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    animation: splashOut 0.6s ease-in 2.3s forwards;
+  }
+  .splash-logo{
+    width:130px; height:130px; border-radius:32px; background:var(--lime);
+    display:flex; align-items:center; justify-content:center; margin-bottom:28px;
+    animation: popIn 0.5s ease-out;
+  }
+  .splash-logo svg{ width:78%; height:78%; }
+  .splash-title{
+    font-size:34px; font-weight:800; letter-spacing:1px; color:#0a0a0a;
+    position:relative; animation: fadeUp 0.5s ease-out 0.15s both;
+  }
+  .splash-title::before,.splash-title::after{
+    content:'PIXEL HEADZ'; position:absolute; left:0; top:0; width:100%; opacity:0.7;
+  }
+  .splash-title::before{ color:#ff2e6c; animation: glitchShift1 2.4s infinite; }
+  .splash-title::after{ color:#00e5ff; animation: glitchShift2 2.4s infinite; }
+  .splash-sub{
+    margin-top:14px; font-size:12px; letter-spacing:5px; color:#0a0a0a99; font-weight:600;
+    animation: fadeUp 0.5s ease-out 0.3s both;
+  }
+  .splash-sub::after{ content:'ENTERING THE GRID'; animation: subSwap 2.3s steps(1) infinite; }
+  @keyframes subSwap{ 0%,60%{content:'ENTERING THE GRID';} 61%,100%{content:'BREACHING';} }
+  @keyframes popIn{ 0%{transform:scale(.6);opacity:0;} 100%{transform:scale(1);opacity:1;} }
+  @keyframes fadeUp{ 0%{transform:translateY(10px);opacity:0;} 100%{transform:translateY(0);opacity:1;} }
+  @keyframes glitchShift1{ 0%,80%,100%{transform:translate(0,0);opacity:0;} 82%{transform:translate(-3px,-1px);opacity:.8;} 85%{transform:translate(2px,1px);opacity:.6;} 88%{transform:translate(0,0);opacity:0;} }
+  @keyframes glitchShift2{ 0%,80%,100%{transform:translate(0,0);opacity:0;} 83%{transform:translate(3px,1px);opacity:.8;} 86%{transform:translate(-2px,-1px);opacity:.6;} 89%{transform:translate(0,0);opacity:0;} }
+  .glitch-bars{ position:absolute; inset:0; pointer-events:none; opacity:0; animation: barsFlicker .5s steps(2) 2.2s forwards; z-index:81;}
+  .glitch-bars div{ position:absolute; left:0; width:100%; height:8%; background:repeating-linear-gradient(90deg, var(--bg) 0 6px, var(--lime-dim) 6px 12px); }
+  .glitch-bars div:nth-child(1){top:18%;} .glitch-bars div:nth-child(2){top:46%;} .glitch-bars div:nth-child(3){top:71%;}
+  @keyframes barsFlicker{ 0%,100%{opacity:0;} 50%{opacity:1;} }
+  @keyframes splashOut{
+    0%{clip-path:inset(0 0 0 0);}
+    30%{clip-path:inset(0 0 40% 0);}
+    50%{clip-path:inset(0 0 40% 0); transform:translateX(-6px);}
+    70%{clip-path:inset(60% 0 0 0); transform:translateX(6px);}
+    100%{clip-path:inset(100% 0 0 0); opacity:0; transform:translateX(0); visibility:hidden;}
+  }
+
+  /* ---------- MAIN PAGE ---------- */
+  #page{ opacity:0; animation: pageIn .4s ease-out 2.7s forwards; }
+  @keyframes pageIn{ 0%{opacity:0;} 100%{opacity:1;} }
+
+  header{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 18px; border-bottom:1px solid #1c1c1c;
+  }
+  .brand{ display:flex; align-items:center; gap:10px; min-width:0; }
+  .brand-icon{
+    width:36px; height:36px; border-radius:10px; background:var(--lime);
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .brand-icon svg{ width:70%; height:70%; }
+  .brand-text h1{ font-size:15px; font-weight:700; }
+  .brand-text p{ font-size:10px; color:var(--text-dim); letter-spacing:1px; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .join-btn{
+    background:var(--lime); color:#0a0a0a; border:none; font-weight:700; font-size:13px;
+    padding:9px 20px; border-radius:20px; flex-shrink:0;
+  }
+  .pass-badge{
+    display:flex; align-items:center; gap:6px;
+    background:transparent; color:var(--lime); border:1px solid var(--lime-dim);
+    font-weight:700; font-size:12px; padding:8px 14px; border-radius:20px; flex-shrink:0;
+  }
+  .pass-badge .dot{ width:7px; height:7px; border-radius:50%; background:var(--lime); }
+
+  main{ padding:18px; }
+
+  .hero-card{
+    position:relative; border-radius:22px; overflow:hidden;
+    background:linear-gradient(180deg,#5ec9e8 0%, #bfe7c9 55%, #e9d9c5 100%);
+    padding:22px 18px 26px; min-height:340px; display:flex; flex-direction:column; justify-content:flex-end;
+  }
+  .hero-top{ position:absolute; top:20px; left:0; right:0; text-align:center; }
+  .hero-title{ font-size:26px; font-weight:800; color:#fff; text-shadow:0 2px 6px rgba(0,0,0,.25); }
+  .hero-title span{ position:relative; display:inline-block; }
+  .hero-title span::before,.hero-title span::after{ content:'Pixel Headz'; position:absolute; left:0; top:0; width:100%; }
+  .hero-title span::before{ color:#ff2e6c; animation: glitchShift1 3s infinite; }
+  .hero-title span::after{ color:#00e5ff; animation: glitchShift2 3s infinite; }
+  .hero-sub{ font-size:11px; color:#fff; margin-top:4px; opacity:.9; }
+  .hero-figure{ align-self:center; font-size:120px; margin:30px 0 10px; }
+
+  .mint-meta{ font-size:10px; letter-spacing:2px; color:var(--lime); font-weight:700; }
+  .mint-big{ font-size:26px; font-weight:800; color:#fff; margin-top:4px; position:relative; display:inline-block; }
+  .mint-big::before,.mint-big::after{ content:'TO BE ANNOUNCED'; position:absolute; left:0; top:0; width:100%; }
+  .mint-big::before{ color:#ff2e6c; animation: glitchShift1 2.5s infinite; }
+  .mint-big::after{ color:#00e5ff; animation: glitchShift2 2.5s infinite; }
+
+  .stay-tuned{ display:flex; align-items:center; gap:6px; font-size:11px; color:#e5e5e5; margin-top:6px; font-weight:600; }
+  .dot-blink{ width:7px; height:7px; border-radius:50%; background:var(--lime); animation: blink 1.1s infinite; }
+  @keyframes blink{ 0%,100%{opacity:1;} 50%{opacity:.2;} }
+
+  .btn-row{ margin-top:18px; display:flex; flex-direction:column; gap:12px; }
+  .btn-disabled{
+    padding:15px; text-align:center; border-radius:14px; font-weight:700; font-size:14px; color:var(--lime-dim);
+    background:repeating-linear-gradient(135deg,#161b0c 0 10px,#1c210f 10px 20px);
+    border:1px solid #2a3016; letter-spacing:1px;
+  }
+  .btn-primary{
+    padding:16px; text-align:center; border-radius:14px; font-weight:800; font-size:15px; color:#0a0a0a;
+    background:var(--lime); box-shadow:0 0 30px rgba(212,255,30,.35); border:none; width:100%;
+  }
+  .btn-primary.outline{
+    background:transparent; color:var(--lime); border:1px solid var(--lime-dim); box-shadow:none;
+  }
+  .btn-pair{ display:flex; gap:10px; }
+  .btn-outline{
+    flex:1; padding:14px; text-align:center; border-radius:12px; font-weight:700; font-size:12px;
+    color:#fff; background:#141414; border:1px solid #2a2a2a;
+  }
+
+  .stats{ display:flex; justify-content:space-between; margin-top:22px; padding-top:16px; border-top:1px solid #1c1c1c; }
+  .stat h2{ font-size:22px; font-weight:800; }
+  .stat h2.accent{ color:var(--lime); }
+  .stat p{ font-size:10px; letter-spacing:1px; color:var(--text-dim); margin-top:2px; }
+
+  .chain-row{ display:flex; align-items:center; gap:12px; margin-top:16px; padding-top:16px; border-top:1px solid #1c1c1c; }
+  .chain-icon{ width:38px; height:38px; border-radius:10px; background:var(--lime); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .chain-icon svg{ width:60%; height:60%; }
+  .chain-row h3{ font-size:14px; font-weight:700; }
+  .chain-row p{ font-size:10px; color:var(--text-dim); letter-spacing:1px; margin-top:2px; }
+
+  /* ---------- MODAL ---------- */
+  #modal-overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,.7); backdrop-filter:blur(3px);
+    display:none; align-items:flex-end; justify-content:center; z-index:60;
+  }
+  #modal-overlay.open{ display:flex; }
+  .modal{
+    width:100%; max-width:420px; background:#0d0d0d;
+    border:1px solid #2a2a2a; border-top:2px solid var(--lime);
+    border-radius:24px 24px 0 0; padding:26px 20px 30px; max-height:88vh; overflow-y:auto;
+    animation: modalUp .35s ease-out;
+  }
+  @keyframes modalUp{ 0%{ transform:translateY(30px); opacity:0;} 100%{transform:translateY(0); opacity:1;} }
+  .modal-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:22px; }
+  .progress{ display:flex; align-items:center; gap:6px; }
+  .progress .seg{ height:8px; width:8px; border-radius:5px; background:#333; transition:.25s; }
+  .progress .seg.done{ background:var(--lime); width:8px; }
+  .progress .seg.active{ background:var(--lime); width:26px; }
+  .progress .label{ font-size:11px; letter-spacing:2px; color:var(--text-dim); margin-left:6px; }
+  .close-x{ width:32px; height:32px; border-radius:8px; background:#171717; border:1px solid #2a2a2a; color:#fff; font-size:16px; }
+
+  .step{ display:none; }
+  .step.active{ display:block; }
+  .step h2{ font-size:24px; font-weight:800; margin-bottom:12px; }
+  .step p.desc{ font-size:13px; color:#b3b3b3; line-height:1.5; margin-bottom:18px; }
+  .field{
+    width:100%; background:#131313; border:1px solid #2a2a2a; border-radius:14px;
+    padding:16px; color:#fff; font-size:15px; margin-bottom:8px;
+  }
+  .field::placeholder{ color:#666; }
+  .hint{ font-size:10px; color:#666; letter-spacing:1px; margin-bottom:20px; }
+
+  .eyebrow{ font-size:11px; letter-spacing:2px; color:var(--lime); font-weight:700; margin-bottom:6px; }
+
+  .pass-card{
+    border-radius:16px; overflow:hidden; padding:16px;
+    background:linear-gradient(135deg,#1b2140,#141a33);
+    border:1px solid #2a2f52; margin:16px 0 14px;
+  }
+  .pass-card-top{ display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+  .pass-card-top .brand-mini{ font-weight:800; font-size:13px; }
+  .pass-card-top .brand-mini span{ color:var(--lime); }
+  .pass-card-top .tag{ font-size:9px; color:#8a90b8; letter-spacing:1px; }
+  .pass-card-body{ display:flex; gap:12px; align-items:center; }
+  .avatar{ width:56px; height:56px; border-radius:12px; background:#2a3055; display:flex; align-items:center; justify-content:center; font-size:26px; flex-shrink:0; }
+  .pass-card-body h3{ font-size:18px; font-weight:800; }
+  .mood{ font-size:10px; color:#a9b0e0; letter-spacing:1px; margin-top:2px; }
+  .tagline{ font-size:11px; color:#c7cbe8; margin-top:4px; }
+  .pass-card-bottom{ display:flex; justify-content:space-between; margin-top:14px; padding-top:10px; border-top:1px solid #2a2f52; font-size:9px; color:#7d84ac; letter-spacing:.5px; }
+  .pass-card-bottom .right{ color:var(--lime); font-weight:700; }
+
+  .chip-row{ display:flex; justify-content:space-between; font-size:11px; color:#b3b3b3; margin-bottom:20px; }
+  .chip-row .accent{ color:#b9a9ff; font-weight:700; }
+
+  .back-link{ display:block; text-align:center; margin-top:16px; font-size:11px; letter-spacing:1px; color:var(--text-dim); background:none; border:none; }
+
+  .task{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    border:1px solid #262626; border-radius:14px; padding:14px 16px; margin-bottom:12px;
+    background:#111; transition:.2s;
+  }
+  .task.done{ border-color:#3a4a12; background:#141a09; }
+  .task-left{ display:flex; align-items:center; gap:12px; min-width:0; }
+  .task-num{ width:28px; height:28px; border-radius:50%; background:#222; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0; }
+  .task.done .task-num{ background:var(--lime); color:#0a0a0a; }
+  .task-title{ font-style:italic; font-weight:700; font-size:14px; }
+  .task-sub{ font-size:11px; color:#777; margin-top:2px; }
+  .task-arrow{ font-size:16px; color:#777; flex-shrink:0; }
+  .task.done .task-arrow{ color:var(--lime); }
+
+  .field-label{ font-size:10px; letter-spacing:2px; color:#888; margin:18px 0 8px; }
+  .validate-msg{ font-size:11px; margin-bottom:16px; letter-spacing:.5px; }
+  .validate-msg.ok{ color:var(--amber); }
+
+  .disclaimer{ font-size:10px; color:#666; line-height:1.6; margin-top:16px; letter-spacing:.3px; }
+
+  .btn-submit{
+    width:100%; padding:16px; border-radius:14px; font-weight:800; font-size:14px; letter-spacing:1px;
+    border:none; margin-top:16px;
+    background:#1c1c1c; color:#555;
+  }
+  .btn-submit.ready{ background:var(--lime); color:#0a0a0a; box-shadow:0 0 30px rgba(212,255,30,.35); }
+
+  .queue-pills{ display:flex; gap:10px; margin:18px 0 20px; }
+  .queue-pill{ flex:1; background:#131313; border:1px solid #2a2a2a; border-radius:12px; padding:12px 8px; text-align:center; }
+  .queue-pill .big{ font-size:16px; font-weight:800; }
+  .queue-pill .small{ font-size:9px; color:var(--text-dim); letter-spacing:1px; margin-top:4px; }
+
+  /* ---------- INFO ROWS (Vision / Roadmap) ---------- */
+  .info-row{ cursor:pointer; }
+  .info-row .chain-arrow{ font-size:18px; color:var(--text-dim); margin-left:auto; }
+
+  /* ---------- INFO MODAL ---------- */
+  #info-modal-overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,.7); backdrop-filter:blur(3px);
+    display:none; align-items:flex-end; justify-content:center; z-index:70;
+  }
+  #info-modal-overlay.open{ display:flex; }
+  .info-body{ font-size:13px; color:#c9c9c9; line-height:1.7; }
+  .info-body h2{ font-size:22px; font-weight:800; color:#fff; margin-bottom:14px; }
+  .info-body p{ margin-bottom:14px; }
+  .info-body p:last-child{ margin-bottom:0; }
+  .roadmap-list{ list-style:none; margin:4px 0 18px; }
+  .roadmap-item{
+    display:flex; align-items:center; gap:12px; padding:12px 0;
+    border-bottom:1px solid #1c1c1c; font-size:13px; color:#e0e0e0; font-weight:600;
+  }
+  .roadmap-item:last-child{ border-bottom:none; }
+  .roadmap-num{
+    width:24px; height:24px; border-radius:50%; background:#171717; border:1px solid var(--lime-dim);
+    color:var(--lime); font-size:11px; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .roadmap-status{
+    display:inline-flex; align-items:center; gap:8px; background:#141a09; border:1px solid #3a4a12;
+    color:var(--lime); font-size:11px; font-weight:800; letter-spacing:1px; padding:10px 14px; border-radius:12px; width:100%;
+    justify-content:center;
+  }
+
+  /* ---------- FLOATING DOTS ---------- */
+  #bubbleCanvas{
+    position:fixed; inset:0; width:100%; height:100%;
+    pointer-events:none; z-index:5;
+  }
+
+  /* ---------- X LINK ---------- */
+  .x-follow{
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    margin-top:18px; padding:14px; border-radius:14px;
+    border:1px solid #262626; background:#111; text-decoration:none;
+  }
+  .x-follow svg{ width:16px; height:16px; fill:#fff; }
+  .x-follow span{ font-size:12px; font-weight:700; letter-spacing:1px; color:#fff; }
+
+  /* ---------- THE PROJECT ---------- */
+  .project-section{ margin-top:26px; }
+  .project-heading{ font-size:24px; font-weight:800; margin-bottom:14px; }
+  .project-card{
+    border:1px solid #2a2a2a; border-radius:20px; padding:22px 18px;
+    background:#111; position:relative; overflow:hidden;
+  }
+  .project-card::before{
+    content:''; position:absolute; inset:0; opacity:.5; pointer-events:none;
+    background-image:radial-gradient(#232323 1px, transparent 1px);
+    background-size:16px 16px;
+  }
+  .project-text{ position:relative; font-size:14px; line-height:1.75; color:#c9c9c9; }
+  .project-text p{ margin-bottom:14px; }
+  .project-text p:last-of-type{ margin-bottom:18px; }
+  .project-text b{ color:var(--lime); font-weight:700; }
+
+  .info-pill-row{ position:relative; display:flex; flex-direction:column; gap:10px; }
+  .info-pill{
+    display:flex; align-items:center; justify-content:space-between;
+    border:1px solid #2a2a2a; border-radius:30px; padding:10px 16px;
+    font-size:11px; color:#888; letter-spacing:.5px;
+  }
+  .info-pill b{ color:#fff; font-size:12px; }
+
+  .project-stats{ display:flex; flex-wrap:wrap; gap:12px; margin-top:16px; }
+  .project-stat{
+    flex:1; min-width:110px; border-radius:16px; padding:18px 16px;
+    border:1px solid; font-weight:800;
+  }
+  .project-stat .num{ font-size:22px; }
+  .project-stat .lbl{ font-size:11px; font-weight:600; margin-top:4px; letter-spacing:.3px; }
+  .project-stat.lime{ background:#1c2408; border-color:#3a4a12; color:var(--lime); }
+  .project-stat.cyan{ background:#08222a; border-color:#134656; color:#5ec9e8; }
+  .project-stat.amber{ background:#2a1608; border-color:#4a2c12; color:#e6b800; }
+
+  /* ---------- SCROLL REVEAL ---------- */
+  .reveal{
+    opacity:0; transform:translateY(22px);
+    transition:opacity .7s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1);
+    will-change:opacity, transform;
+  }
+  .reveal.in-view{ opacity:1; transform:translateY(0); }
+  .reveal.pop.in-view{ animation: revealPop .6s cubic-bezier(.22,1,.36,1); }
+  @keyframes revealPop{
+    0%{ transform:scale(.92) translateY(22px); opacity:0; }
+    60%{ transform:scale(1.02) translateY(-2px); opacity:1; }
+    100%{ transform:scale(1) translateY(0); opacity:1; }
+  }
+
+  /* ---------- FOOTER ---------- */
+  .site-footer{ margin-top:26px; }
+  .footer-line{ border-top:1px solid #262626; margin-bottom:16px; }
+  .footer-bottom{
+    display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap;
+    gap:12px; padding-bottom:22px; font-size:11px; color:var(--text-dim); letter-spacing:.3px;
+  }
+  .footer-left b{ color:#fff; }
+  .footer-right{ display:flex; align-items:center; gap:16px; }
+  .footer-icon{
+    display:flex; align-items:center; justify-content:center; color:#fff; text-decoration:none;
+    padding:8px; margin:-8px; cursor:pointer;
+  }
+  .footer-icon svg{ width:16px; height:16px; fill:currentColor; }
+  .footer-discord{ display:flex; align-items:center; gap:6px; color:var(--text-dim); }
+  .footer-discord svg{ width:16px; height:16px; fill:currentColor; }
+</style>
+</head>
+<body>
+
+<canvas id="bubbleCanvas"></canvas>
+<div class="glitch-bars"><div></div><div></div><div></div></div>
+<div id="splash">
+  <div class="splash-logo">
+    <svg viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#d4ff1e"/><rect x="26" y="32" width="14" height="14" fill="#0a0a0a"/><rect x="60" y="32" width="14" height="14" fill="#0a0a0a"/><rect x="26" y="62" width="48" height="12" fill="#0a0a0a"/></svg>
+  </div>
+  <div class="splash-title">PIXEL HEADZ</div>
+  <div class="splash-sub"></div>
+</div>
+
+<div class="phone" id="page">
+  <header>
+    <div class="brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#0a0a0a"/><rect x="26" y="32" width="14" height="14" fill="#d4ff1e"/><rect x="60" y="32" width="14" height="14" fill="#d4ff1e"/><rect x="26" y="62" width="48" height="12" fill="#d4ff1e"/></svg>
+      </div>
+      <div class="brand-text">
+        <h1>Pixel Headz</h1>
+        <p>ROBINHOOD CHAIN &middot; PRE-MINT</p>
+      </div>
+    </div>
+    <button class="join-btn" id="joinBtnTop" onclick="openModal()">JOIN</button>
+    <div class="pass-badge" id="passBadge" style="display:none;"><span class="dot"></span><span id="passBadgeNum">PASS #0000</span></div>
+  </header>
+
+  <main>
+    <div class="hero-card reveal">
+      <div class="hero-top">
+        <div class="hero-title"><span>Pixel Headz</span></div>
+        <div class="hero-sub">9,889 Headz. One Grid. Real Financial Utility.</div>
+      </div>
+      <div class="hero-figure">👾</div>
+    </div>
+
+    <div style="margin-top:18px;" class="reveal">
+      <div class="mint-meta">PIXEL HEADZ MINT &middot; DATE TBA</div>
+      <div class="mint-big">TO BE ANNOUNCED</div>
+      <div class="stay-tuned"><span class="dot-blink"></span> STAY TUNED</div>
+    </div>
+
+    <div class="btn-row reveal">
+      <div class="btn-disabled">MINT — COMING SOON</div>
+      <button class="btn-primary" id="waitlistBtn" onclick="openModal()">JOIN THE WAITLIST</button>
+    </div>
+
+    <div class="stats reveal">
+      <div class="stat"><h2 class="count-num" data-target="9889">0</h2><p>COLLECTION SIZE</p></div>
+      <div class="stat"><h2 class="accent">TBA</h2><p>MINT PRICE</p></div>
+    </div>
+
+    <div class="chain-row reveal">
+      <div class="chain-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2 L20 6 V14 C20 18 16.5 21 12 22 C7.5 21 4 18 4 14 V6 Z" fill="#0a0a0a"/></svg></div>
+      <div>
+        <h3>Robinhood Chain</h3>
+        <p>CONTRACT NOT YET DEPLOYED</p>
+      </div>
+    </div>
+
+    <div class="project-section">
+      <div class="project-heading reveal">The project</div>
+      <div class="project-card reveal">
+        <div class="project-text">
+          <p>Pixel Headz began as a stack of pixel-art sketches and a stubborn idea: build a full Grid, one Headz at a time. Layered on top is a fully generative, <b>layer-based PFP</b> engine that assembles traits with zero repeats across all <b>9,889</b>.</p>
+          <p>Pixel Headz mints natively on <b>Robinhood Chain</b>, keeping every trait, reveal and transfer fast, low mint fee and verifiable on-chain.</p>
+          <p>Built for collectors, not just flippers.</p>
+        </div>
+        <div class="info-pill-row">
+          <div class="info-pill">CHAIN <b>Robinhood Chain</b></div>
+          <div class="info-pill">FORMAT <b>Layer based PFP</b></div>
+          <div class="info-pill">TOTAL SUPPLY <b>9,889</b></div>
+          <div class="info-pill">MINT DATE &amp; PRICE <b>TBA</b></div>
+        </div>
+      </div>
+
+      <div class="project-stats">
+        <div class="project-stat lime reveal pop"><div class="num count-num" data-target="9889">0</div><div class="lbl">total supply</div></div>
+        <div class="project-stat cyan reveal pop"><div class="num">TBA</div><div class="lbl">whitelist spots</div></div>
+        <div class="project-stat amber reveal pop"><div class="num count-num" data-suffix="+" data-target="150">0</div><div class="lbl">trait layers</div></div>
+      </div>
+    </div>
+
+    <div class="chain-row info-row reveal" onclick="openInfoModal('vision')">
+      <div class="chain-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M2 12 C4.5 6 8 3.5 12 3.5 C16 3.5 19.5 6 22 12 C19.5 18 16 20.5 12 20.5 C8 20.5 4.5 18 2 12 Z" stroke="#0a0a0a" stroke-width="2"/><circle cx="12" cy="12" r="3.2" fill="#0a0a0a"/></svg></div>
+      <div>
+        <h3>Our Vision</h3>
+        <p>READ THE VISION</p>
+      </div>
+      <div class="chain-arrow">›</div>
+    </div>
+
+    <div class="chain-row info-row reveal" onclick="openInfoModal('roadmap')">
+      <div class="chain-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 20 L4 15 L9 13 L14 16 L20 14 L20 4 L14 6 L9 3 L4 5 Z" fill="#0a0a0a"/></svg></div>
+      <div>
+        <h3>Roadmap</h3>
+        <p>VIEW ROADMAP</p>
+      </div>
+      <div class="chain-arrow">›</div>
+    </div>
+
+    <div class="site-footer reveal">
+      <div class="footer-line"></div>
+      <div class="footer-bottom">
+        <div class="footer-left">© 2026 <b>Pixel Headz</b>.</div>
+        <div class="footer-right">
+          <a class="footer-icon" href="https://x.com/PHeadzNFTs" target="_blank" rel="noopener noreferrer" aria-label="Follow on X" onclick="window.open('https://x.com/PHeadzNFTs','_blank','noopener,noreferrer'); return false;">
+            <svg viewBox="0 0 24 24"><path d="M18.9 2H22.1L14.9 10.4L23.4 22H16.7L11.5 15.1L5.5 22H2.3L10 13L1.8 2H8.7L13.4 8.3L18.9 2ZM17.7 20H19.6L7.6 3.9H5.5L17.7 20Z"/></svg>
+          </a>
+          <span class="footer-discord">
+            <svg viewBox="0 0 24 24"><path d="M20.3 5.4C18.9 4.7 17.4 4.2 15.8 4C15.6 4.3 15.4 4.7 15.3 5.1C13.6 4.8 11.9 4.8 10.2 5.1C10 4.7 9.8 4.3 9.6 4C8 4.2 6.5 4.7 5.1 5.4C2.3 9.5 1.5 13.6 1.9 17.6C3.7 19 5.4 19.8 7.1 20.3C7.5 19.8 7.9 19.2 8.2 18.6C7.6 18.4 7 18.1 6.5 17.7C6.6 17.6 6.8 17.5 6.9 17.4C10.2 18.9 13.8 18.9 17.1 17.4C17.2 17.5 17.3 17.6 17.5 17.7C17 18.1 16.4 18.4 15.8 18.6C16.1 19.2 16.5 19.8 16.9 20.3C18.6 19.8 20.3 19 22.1 17.6C22.6 12.9 21.4 8.8 20.3 5.4ZM8.7 15.1C7.7 15.1 6.9 14.2 6.9 13.1C6.9 12 7.7 11.1 8.7 11.1C9.7 11.1 10.5 12 10.5 13.1C10.5 14.2 9.7 15.1 8.7 15.1ZM15.3 15.1C14.3 15.1 13.5 14.2 13.5 13.1C13.5 12 14.3 11.1 15.3 11.1C16.3 11.1 17.1 12 17.1 13.1C17.1 14.2 16.3 15.1 15.3 15.1Z"/></svg>
+            Discord (Coming Soon)
+          </span>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- MODAL -->
+<div id="modal-overlay">
+  <div class="modal">
+    <div class="modal-top">
+      <div class="progress" id="progressBar">
+        <div class="seg active" data-seg="1"></div>
+        <div class="seg" data-seg="2"></div>
+        <div class="seg" data-seg="3"></div>
+        <span class="label" id="progressLabel">STEP 1 OF 3</span>
+      </div>
+      <button class="close-x" onclick="closeModal()">✕</button>
+    </div>
+
+    <!-- STEP 1 -->
+    <div class="step active" id="step1">
+      <h2>Who are you on X?</h2>
+      <p class="desc">Your pass is minted from your handle, so the card you post carries your name — not a wallet address.</p>
+      <input class="field" id="handleInput" placeholder="@yourhandle" />
+      <div class="hint">NO SIGN-IN &middot; NO WALLET YET &middot; NOTHING STORED</div>
+      <button class="btn-primary" onclick="goStep2()">CONTINUE</button>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step" id="step2">
+      <div class="eyebrow" id="passMintedLabel">PASS MINTED &middot; @yourhandle</div>
+      <h2>Here it is.</h2>
+      <div class="pass-card">
+        <div class="pass-card-top">
+          <div class="brand-mini">Pixel<span>Headz</span></div>
+          <div class="tag">HEADZ PASS</div>
+        </div>
+        <div class="pass-card-body">
+          <div class="avatar">👾</div>
+          <div>
+            <h3 id="cardHandle">@yourhandle</h3>
+            <div class="mood">MOOD &middot; <span id="cardMood">CURIOUS</span></div>
+            <div class="tagline" id="cardTagline">New to the Grid, already vibing.</div>
+          </div>
+        </div>
+        <div class="pass-card-bottom">
+          <span id="cardPassNum">PASS #0000 &middot; SEPTEMBER / 2026</span>
+          <span class="right">9,889 HEADZ &middot; ONE GRID</span>
+        </div>
+      </div>
+      <div class="chip-row">
+        <span id="chipPassNum">PASS #0000</span>
+        <span class="accent" id="chipMood">CURIOUS</span>
+        <span id="chipCode">HEADZ-0000-000A</span>
+      </div>
+      <button class="btn-primary" onclick="goStep3()">CLAIM PASS &amp; SUBMIT WALLET</button>
+      <button class="back-link" onclick="goStep1()">‹ DIFFERENT HANDLE</button>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="step" id="step3">
+      <p class="desc" style="margin-bottom:20px;">4 taps on X, then the wallet that should hold the mint.</p>
+
+      <div class="task" id="task1" onclick="toggleTask(1)">
+        <div class="task-left">
+          <div class="task-num">1</div>
+          <div><div class="task-title">Quote the whitelist post</div><div class="task-sub">Opens X with your pass already written</div></div>
+        </div>
+        <div class="task-arrow">↗</div>
+      </div>
+      <div class="task" id="task2" onclick="toggleTask(2)">
+        <div class="task-left">
+          <div class="task-num">2</div>
+          <div><div class="task-title">Repost it</div><div class="task-sub">One tap on X</div></div>
+        </div>
+        <div class="task-arrow">↗</div>
+      </div>
+      <div class="task" id="task3" onclick="toggleTask(3)">
+        <div class="task-left">
+          <div class="task-num">3</div>
+          <div><div class="task-title">Like it</div><div class="task-sub">One tap on X</div></div>
+        </div>
+        <div class="task-arrow">↗</div>
+      </div>
+      <div class="task" id="task4" onclick="toggleTask(4)">
+        <div class="task-left">
+          <div class="task-num">4</div>
+          <div><div class="task-title">Leave a comment</div><div class="task-sub">Say something in the replies</div></div>
+        </div>
+        <div class="task-arrow">↗</div>
+      </div>
+
+      <div class="field-label">PASTE THE LINK TO YOUR QUOTE</div>
+      <input class="field" id="quoteLink" placeholder="https://x.com/you/status/…" oninput="checkQuote()" />
+      <div class="hint" style="margin-bottom:6px;">POST IT FIRST, THEN COPY THE LINK FROM X AND DROP IT HERE.</div>
+      <div class="validate-msg ok" id="quoteValidateMsg" style="display:none;">POST FOUND &middot; <span id="quoteHandleEcho"></span> &middot; QUOTE NOT CONFIRMED</div>
+
+      <div class="field-label">YOUR WALLET</div>
+      <input class="field" id="walletInput" placeholder="0x0000… or yourname.eth" oninput="checkSubmitReady()" />
+
+      <button class="btn-submit" id="submitWalletBtn" onclick="goFinal()">SUBMIT WALLET</button>
+
+      <div class="disclaimer">The steps open X — we cannot see what you do there, so they are recorded as your word and checked against your account before the drop. The pass records interest only — it is not an allowlist spot, a token, or a right to mint.</div>
+      <button class="back-link" onclick="goStep2()">‹ BACK TO PASS</button>
+    </div>
+
+    <!-- STEP 4 : FINAL -->
+    <div class="step" id="step4">
+      <div class="eyebrow">YOU ARE IN THE QUEUE</div>
+      <h2 id="finalHeadline">@yourhandle is in the Grid.</h2>
+      <div class="queue-pills">
+        <div class="queue-pill"><div class="big" id="pillPosition">#00000</div><div class="small">POSITION</div></div>
+        <div class="queue-pill"><div class="big" id="pillCode">0000</div><div class="small">CODE</div></div>
+      </div>
+      <button class="btn-primary" style="margin-bottom:12px;" onclick="postPass()">POST YOUR PASS</button>
+      <div class="btn-pair">
+        <button class="btn-outline" onclick="finishFlow()">DONE</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- INFO MODAL (Vision / Roadmap) -->
+<div id="info-modal-overlay">
+  <div class="modal">
+    <div class="modal-top">
+      <div class="eyebrow" id="infoModalEyebrow">OUR VISION</div>
+      <button class="close-x" onclick="closeInfoModal()">✕</button>
+    </div>
+    <div class="info-body" id="infoModalBody"></div>
+  </div>
+</div>
+
+<script>
+const moods = ['CURIOUS','MOODY SAD','HYPED','CHILL','LOCKED IN'];
+const taglines = [
+  'New to the Grid, already vibing.',
+  'Thunder in the charts, calm in the Grid.',
+  'Quiet plans, loud conviction.',
+  'Just here for the story.'
+];
+let state = { handle:'@yourhandle', passNum:0, mood:'', tagline:'', code:'', tasksDone:new Set() };
+let positionCounter = 1;
+
+// ⬇️ EDIT THIS: put your real whitelist form/link here once you have it
+const WL_LINK = 'https://your-whitelist-link-here.com';
+
+function postPass(){
+  const text = 'Just applied for Wl in @PHeadzNFTs\n\nApply for Wl: ' + WL_LINK;
+  const url = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(text);
+  window.open(url, '_blank');
+}
+
+function openModal(){
+  document.getElementById('modal-overlay').classList.add('open');
+  goStep1();
+}
+function closeModal(){
+  document.getElementById('modal-overlay').classList.remove('open');
+}
+function showStep(n){
+  document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+  document.getElementById('step'+n).classList.add('active');
+  document.querySelectorAll('.seg').forEach(s=>{s.classList.remove('active','done');});
+  for(let i=1;i<=3;i++){
+    const seg = document.querySelector('.seg[data-seg="'+i+'"]');
+    const stepIdx = Math.min(n,3);
+    if(i < stepIdx) seg.classList.add('done');
+    else if(i === stepIdx) seg.classList.add('active');
+  }
+  document.getElementById('progressLabel').textContent = n>=4 ? 'YOU ARE ON THE LIST' : 'STEP '+n+' OF 3';
+}
+function goStep1(){ showStep(1); }
+function goStep2(){
+  const h = document.getElementById('handleInput').value.trim();
+  state.handle = h ? (h.startsWith('@')?h:'@'+h) : '@yourhandle';
+  state.passNum = String(Math.floor(1000+Math.random()*8999));
+  state.mood = moods[Math.floor(Math.random()*moods.length)];
+  state.tagline = taglines[Math.floor(Math.random()*taglines.length)];
+  state.code = 'HEADZ-'+Math.random().toString(16).slice(2,6).toUpperCase()+'-'+Math.random().toString(16).slice(2,5).toUpperCase();
+
+  document.getElementById('passMintedLabel').textContent = 'PASS MINTED · '+state.handle;
+  document.getElementById('cardHandle').textContent = state.handle;
+  document.getElementById('cardMood').textContent = state.mood;
+  document.getElementById('cardTagline').textContent = state.tagline;
+  document.getElementById('cardPassNum').textContent = 'PASS #'+state.passNum+' · SEPTEMBER / 2026';
+  document.getElementById('chipPassNum').textContent = 'PASS #'+state.passNum;
+  document.getElementById('chipMood').textContent = state.mood;
+  document.getElementById('chipCode').textContent = state.code;
+
+  showStep(2);
+}
+function goStep3(){ showStep(3); }
+function toggleTask(n){
+  const el = document.getElementById('task'+n);
+  el.classList.toggle('done');
+  if(el.classList.contains('done')) state.tasksDone.add(n); else state.tasksDone.delete(n);
+}
+function checkQuote(){
+  const v = document.getElementById('quoteLink').value.trim();
+  const msg = document.getElementById('quoteValidateMsg');
+  if(v.length > 8){
+    document.getElementById('quoteHandleEcho').textContent = state.handle;
+    msg.style.display = 'block';
+  } else {
+    msg.style.display = 'none';
+  }
+}
+function checkSubmitReady(){
+  const wallet = document.getElementById('walletInput').value.trim();
+  const quote = document.getElementById('quoteLink').value.trim();
+  const btn = document.getElementById('submitWalletBtn');
+  if(wallet.length > 3 && quote.length > 8) btn.classList.add('ready');
+  else btn.classList.remove('ready');
+}
+function goFinal(){
+  const btn = document.getElementById('submitWalletBtn');
+  if(!btn.classList.contains('ready')) return;
+  document.getElementById('finalHeadline').textContent = state.handle+' is in the Grid.';
+  document.getElementById('pillPosition').textContent = '#'+positionCounter;
+  positionCounter++;
+  document.getElementById('pillCode').textContent = state.code.split('-')[1];
+  showStep(4);
+}
+function finishFlow(){
+  closeModal();
+  document.getElementById('joinBtnTop').style.display = 'none';
+  document.getElementById('passBadge').style.display = 'flex';
+  document.getElementById('passBadgeNum').textContent = 'PASS #'+state.passNum;
+  const wb = document.getElementById('waitlistBtn');
+  wb.textContent = 'VIEW YOUR HOOD PASS';
+  wb.classList.add('outline');
+  wb.onclick = openModal;
+}
+
+const infoContent = {
+  vision: {
+    eyebrow: 'OUR VISION',
+    html: `
+      <h2>Our Vision</h2>
+      <p>Pixel Headz is more than a collection — it's a growing world built one Headz at a time.</p>
+      <p>Every Headz is handcrafted with its own personality, story, and identity. Our goal is to build a recognizable digital collectible brand where art comes first, community comes next, and the future is shaped together with our holders.</p>
+      <p>We believe NFTs should feel like more than something sitting in a wallet. They should represent creativity, identity, belonging, and participation.</p>
+      <p>From the Genesis collection to what comes next, Pixel Headz will continue to evolve through new art, community experiences, collaborations, and surprises.</p>
+      <p>No empty promises. No rushed roadmap.<br>Just one Headz at a time.</p>
+    `
+  },
+  roadmap: {
+    eyebrow: 'ROADMAP',
+    html: `
+      <h2>Roadmap</h2>
+      <ul class="roadmap-list">
+        <li class="roadmap-item"><div class="roadmap-num">1</div>Pixel Headz collection development</li>
+        <li class="roadmap-item"><div class="roadmap-num">2</div>Official website launch</li>
+        <li class="roadmap-item"><div class="roadmap-num">3</div>X / social community setup</li>
+        <li class="roadmap-item"><div class="roadmap-num">4</div>Collection reveal</li>
+        <li class="roadmap-item"><div class="roadmap-num">5</div>Community building</li>
+        <li class="roadmap-item"><div class="roadmap-num">6</div>Mint announcement</li>
+        <li class="roadmap-item"><div class="roadmap-num">7</div>Holder verification &amp; support</li>
+      </ul>
+      <div class="roadmap-status"><span class="dot-blink"></span> STATUS: IN PROGRESS</div>
+    `
+  }
+};
+function openInfoModal(key){
+  const data = infoContent[key];
+  if(!data) return;
+  document.getElementById('infoModalEyebrow').textContent = data.eyebrow;
+  document.getElementById('infoModalBody').innerHTML = data.html;
+  document.getElementById('info-modal-overlay').classList.add('open');
+}
+function closeInfoModal(){
+  document.getElementById('info-modal-overlay').classList.remove('open');
+}
+
+/* ---------- FLOATING / ORBITING WHITE DOTS ---------- */
+(function(){
+  const canvas = document.getElementById('bubbleCanvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, DPR;
+  function resize(){
+    DPR = Math.min(window.devicePixelRatio||1, 2);
+    W = window.innerWidth; H = window.innerHeight;
+    canvas.width = W*DPR; canvas.height = H*DPR;
+    canvas.style.width = W+'px'; canvas.style.height = H+'px';
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  function makeDot(){
+    return {
+      cx: Math.random()*W,
+      cy: Math.random()*H,
+      orbitR: 18 + Math.random()*70,
+      angle: Math.random()*Math.PI*2,
+      speed: (0.0025 + Math.random()*0.006) * (Math.random()<0.5?1:-1),
+      driftX: (Math.random()-0.5)*0.08,
+      driftY: (Math.random()-0.5)*0.08,
+      r: 1.2 + Math.random()*2.4,
+      alpha: 0.35 + Math.random()*0.55
+    };
+  }
+  const N = Math.max(24, Math.floor((W*H)/32000));
+  let dots = Array.from({length:N}, makeDot);
+
+  function draw(d, x, y){
+    ctx.beginPath();
+    ctx.fillStyle = 'rgba(255,255,255,' + d.alpha + ')';
+    ctx.shadowColor = 'rgba(255,255,255,0.8)';
+    ctx.shadowBlur = d.r*3;
+    ctx.arc(x, y, d.r, 0, Math.PI*2);
+    ctx.fill();
+  }
+
+  function tick(){
+    ctx.clearRect(0,0,W,H);
+    for(const d of dots){
+      d.angle += d.speed;
+      d.cx += d.driftX;
+      d.cy += d.driftY;
+
+      if(d.cx < -80) d.cx = W+80;
+      if(d.cx > W+80) d.cx = -80;
+      if(d.cy < -80) d.cy = H+80;
+      if(d.cy > H+80) d.cy = -80;
+
+      const x = d.cx + Math.cos(d.angle)*d.orbitR;
+      const y = d.cy + Math.sin(d.angle)*d.orbitR;
+      draw(d, x, y);
+    }
+    ctx.shadowBlur = 0;
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
+
+/* ---------- SCROLL REVEAL + COUNT-UP ---------- */
+(function(){
+  function easeOutExpo(t){ return t===1 ? 1 : 1 - Math.pow(2, -10*t); }
+
+  function runCountUp(el){
+    if(el.dataset.counted) return;
+    el.dataset.counted = '1';
+    const target = parseInt(el.getAttribute('data-target'), 10) || 0;
+    const suffix = el.getAttribute('data-suffix') || '';
+    const duration = 1300;
+    const start = performance.now();
+    function frame(now){
+      const p = Math.min((now - start) / duration, 1);
+      const val = Math.round(target * easeOutExpo(p));
+      el.textContent = val.toLocaleString('en-US') + suffix;
+      if(p < 1) requestAnimationFrame(frame);
+      else el.textContent = target.toLocaleString('en-US') + suffix;
+    }
+    requestAnimationFrame(frame);
+  }
+
+  const revealEls = document.querySelectorAll('.reveal');
+  const countEls = document.querySelectorAll('.count-num');
+
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        entry.target.classList.add('in-view');
+        const nums = entry.target.classList.contains('count-num')
+          ? [entry.target]
+          : entry.target.querySelectorAll('.count-num');
+        nums.forEach(runCountUp);
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.25, rootMargin: '0px 0px -8% 0px' });
+
+  revealEls.forEach((el, i)=>{
+    el.style.transitionDelay = Math.min(i * 45, 250) + 'ms';
+    io.observe(el);
+  });
+  countEls.forEach(el=>{
+    if(!el.closest('.reveal')) io.observe(el);
+  });
+})();
+</script>
+
+</body>
+</html>
